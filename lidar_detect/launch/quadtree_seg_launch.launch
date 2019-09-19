@@ -1,0 +1,4 @@
+<launch>
+    <rosparam command="load" file="$(find lidar_detect)/cfg/quad_params.yaml"/>
+    <node name="quadtree_seg" pkg="lidar_detect" type="quadtree_seg" />
+</launch>
