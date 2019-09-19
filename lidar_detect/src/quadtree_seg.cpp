@@ -26,17 +26,18 @@ static constexpr double PI = 3.1415926;
 
 #define LEVEL0_THRESHOLD 16384      // 16384 
 #define LEVEL1_THRESHOLD 4096       // 4096
-#define LEVEL2_THRESHOLD 700       // 1024 or 700
-#define LEVEL3_THRESHOLD 180        // 256 or 180
-#define LEVEL4_THRESHOLD 40         // 64 or 40
-#define LEVEL5_THRESHOLD 13         // 16 or 13
-#define LEVEL6_THRESHOLD 2          // 4 or 2
+#define LEVEL2_THRESHOLD 1024       // 1024 or 700
+#define LEVEL3_THRESHOLD 256       // 256 or 180
+#define LEVEL4_THRESHOLD 64        // 64 or 40
+#define LEVEL5_THRESHOLD 16         // 16 or 13
+#define LEVEL6_THRESHOLD 4          // 4 or 2
 #define LEVEL7_THRESHOLD 1          // 1
 
 /* MAIN CLASS */
 struct XYI{
     int count;
     double x, y;
+    double maxZ;
 };
 
 static jsk_recognition_msgs::BoundingBoxArray totalBox;
@@ -158,162 +159,34 @@ public:
         Children[2] = new QuadNode(DRbox);
         Children[3] = new QuadNode(DLbox);
 
-        if(check_UR(total_pixel, URbox)) Children[0]->divideQuadTree(); 
+        if(check_child(total_pixel, URbox)) Children[0]->divideQuadTree(); 
         delete Children[0];
 
-        if(check_UL(total_pixel, ULbox)) Children[1]->divideQuadTree(); 
+        if(check_child(total_pixel, ULbox)) Children[1]->divideQuadTree(); 
         delete Children[1];
 
-        if(check_DR(total_pixel, DRbox)) Children[2]->divideQuadTree(); 
+        if(check_child(total_pixel, DRbox)) Children[2]->divideQuadTree(); 
         delete Children[2];
 
-        if(check_DL(total_pixel, DLbox)) Children[3]->divideQuadTree(); 
+        if(check_child(total_pixel, DLbox)) Children[3]->divideQuadTree(); 
         delete Children[3];
 
         return 1;
     }
 
-    bool check_UR(std::vector< std::vector<XYI> >& in_pixel, BOX& in_box)
-    {
+    bool check_child(std::vector< std::vector<XYI> >& in_pixel, BOX& in_box){
         int pixelCnt = 0;
         int start_X, start_Y;
-        start_Y = start_Yindex - (in_box.Ypose / boxSize);
-        start_X = start_Xindex + (in_box.Xpose / boxSize);
-
-        start_Y = start_Y - (in_box.pixelSize / 2) + 1;
-        start_X = start_X - (in_box.pixelSize / 2);
-
-        for(uint i = start_Y; i < start_Y + in_box.pixelSize; ++i){
-            for(uint j = start_X; j < start_X + in_box.pixelSize; ++j){
-                pixelCnt += in_pixel[i][j].count;
-            }
-        }
-        if (pixelCnt == 0) return false;
-        else if(check_threshold(in_box, pixelCnt)) return true;
-        else if(!check_threshold(in_box, pixelCnt)){
-            jsk_recognition_msgs::BoundingBox box_s;
-            box_s.header.frame_id = "velodyne";
-            box_s.header.seq = 0;
-            box_s.header.stamp = ros::Time();
-            box_s.dimensions.x = in_box.size;
-            box_s.dimensions.y = in_box.size;
-            box_s.dimensions.z = box_z;
-            box_s.pose.position.x = in_box.Xpose;
-            box_s.pose.position.y = in_box.Ypose;
-            box_s.pose.position.z = box_height;
-            box_s.pose.orientation.x = 0.0;
-            box_s.pose.orientation.y = 0.0;
-            box_s.pose.orientation.z = 0.0;
-            box_s.pose.orientation.w = 0.0;
-            box_s.value = 1;
-            box_s.label = 1;
-            totalBox.boxes.push_back(box_s);
-            return false;
-        }
-        else{
-            ROS_ERROR("check children error! (FUNC %s)(LINE %ld)", __FUNCTION__, __LINE__);
-            exit(1);
-        }
-        
-    }
-
-    bool check_UL(std::vector< std::vector<XYI> >& in_pixel, BOX& in_box)
-    {
-        int pixelCnt = 0;
-        int start_X, start_Y;
+        double longest_z = -1.785;
         start_Y = start_Yindex - (in_box.Ypose / boxSize);
         start_X = start_Xindex + (in_box.Xpose / boxSize);
         start_Y = start_Y - (in_box.pixelSize / 2) + 1;
         start_X = start_X - (in_box.pixelSize / 2);
 
+    
         for(uint i = start_Y; i < start_Y + in_box.pixelSize; ++i){
             for(uint j = start_X; j < start_X + in_box.pixelSize; ++j){
-                pixelCnt += in_pixel[i][j].count;
-            }
-        }
-
-        if (pixelCnt == 0) return false;
-        else if(check_threshold(in_box, pixelCnt)) return true;
-        else if(!check_threshold(in_box, pixelCnt)){
-            jsk_recognition_msgs::BoundingBox box_s;
-            box_s.header.frame_id = "velodyne";
-            box_s.header.seq = 0;
-            box_s.header.stamp = ros::Time();
-            box_s.dimensions.x = in_box.size;
-            box_s.dimensions.y = in_box.size;
-            box_s.dimensions.z = box_z;
-            box_s.pose.position.x = in_box.Xpose;
-            box_s.pose.position.y = in_box.Ypose;
-            box_s.pose.position.z = box_height;
-            box_s.pose.orientation.x = 0.0;
-            box_s.pose.orientation.y = 0.0;
-            box_s.pose.orientation.z = 0.0;
-            box_s.pose.orientation.w = 0.0;
-            box_s.value = 1;
-            box_s.label = 1;
-            totalBox.boxes.push_back(box_s);
-            return false;
-        }
-        else{
-            ROS_ERROR("check children error! (FUNC %s)(LINE %ld)", __FUNCTION__, __LINE__);
-            exit(1);
-        }
-
-    }
-
-    bool check_DR(std::vector< std::vector<XYI> >& in_pixel, BOX& in_box){
-        int pixelCnt = 0;
-        int start_X, start_Y;
-        start_Y = start_Yindex - (in_box.Ypose / boxSize);
-        start_X = start_Xindex + (in_box.Xpose / boxSize);
-        start_Y = start_Y - (in_box.pixelSize / 2) + 1;
-        start_X = start_X - (in_box.pixelSize / 2);
-
-        for(uint i = start_Y; i < start_Y + in_box.pixelSize; ++i){
-            for(uint j = start_X; j < start_X + in_box.pixelSize; ++j){
-                pixelCnt += in_pixel[i][j].count;
-            }
-        }
-
-        if (pixelCnt == 0) return false;
-        else if(check_threshold(in_box, pixelCnt)) return true;
-        else if(!check_threshold(in_box, pixelCnt)){
-            jsk_recognition_msgs::BoundingBox box_s;
-            box_s.header.frame_id = "velodyne";
-            box_s.header.seq = 0;
-            box_s.header.stamp = ros::Time();
-            box_s.dimensions.x = in_box.size;
-            box_s.dimensions.y = in_box.size;
-            box_s.dimensions.z = box_z;
-            box_s.pose.position.x = in_box.Xpose;
-            box_s.pose.position.y = in_box.Ypose;
-            box_s.pose.position.z = box_height;
-            box_s.pose.orientation.x = 0.0;
-            box_s.pose.orientation.y = 0.0;
-            box_s.pose.orientation.z = 0.0;
-            box_s.pose.orientation.w = 0.0;
-            box_s.value = 1;
-            box_s.label = 1;
-            totalBox.boxes.push_back(box_s);
-            return false;
-        }
-        else{
-            ROS_ERROR("check children error! (FUNC %s)(LINE %ld)", __FUNCTION__, __LINE__);
-            exit(1);
-        }
-
-    }
-
-    bool check_DL(std::vector< std::vector<XYI> >& in_pixel, BOX& in_box){
-        int pixelCnt = 0;
-        int start_X, start_Y;
-        start_Y = start_Yindex - (in_box.Ypose / boxSize);
-        start_X = start_Xindex + (in_box.Xpose / boxSize);
-        start_Y = start_Y - (in_box.pixelSize / 2) + 1;
-        start_X = start_X - (in_box.pixelSize / 2);
-
-        for(uint i = start_Y; i < start_Y + in_box.pixelSize; ++i){
-            for(uint j = start_X; j < start_X + in_box.pixelSize; ++j){
+                if(in_pixel[i][j].maxZ > longest_z) longest_z = in_pixel[i][j].maxZ;
                 pixelCnt += in_pixel[i][j].count;
             }
         }
@@ -328,10 +201,10 @@ public:
             box_s.header.stamp = ros::Time();
             box_s.dimensions.x = in_box.size;
             box_s.dimensions.y = in_box.size;
-            box_s.dimensions.z = box_z;
+            box_s.dimensions.z = longest_z + 1.785;
             box_s.pose.position.x = in_box.Xpose;
             box_s.pose.position.y = in_box.Ypose;
-            box_s.pose.position.z = box_height;
+            box_s.pose.position.z = -1.785 + (longest_z + 1.785) / 2;
             box_s.pose.orientation.x = 0.0;
             box_s.pose.orientation.y = 0.0;
             box_s.pose.orientation.z = 0.0;
@@ -428,23 +301,6 @@ public:
         }
     }
 
-    // inline void printCnt(){ ROS_INFO("gCnt = %ld", grouping_count); }
-/*
-    void grouping(int index, int box_label, int& loop_i){
-        jsk_recognition_msgs::BoundingBox tmp;
-        tmp = totalBox.boxes[index];
-        totalBox.boxes.erase(totalBox.boxes.begin() + index);
-        tmp.label = box_label;
-        clusteredBox.boxes.push_back(tmp);
-        loop_i = loop_i - 1;
-
-        for(uint i = 0; i < totalBox.boxes.size(); ++i){
-            if(check_dist(tmp, totalBox.boxes[i])){
-                grouping(i, box_label, i);
-            }
-        }
-    }
-*/
     void makeGroup(){
         int _label_;
         srand((unsigned)time(NULL));
@@ -558,6 +414,8 @@ public:
         for(auto point : scan.points){
             indexX = poseX + (ceil(point.x / boxSize) - 1);
             indexY = poseY - (ceil(point.y / boxSize) - 1);
+            if(total_pixel[indexY][indexX].maxZ < point.z)
+                total_pixel[indexY][indexX].maxZ = point.z;
             if(total_pixel[indexY][indexX].count != 0) continue;
             total_pixel[indexY][indexX].count++;
         }
@@ -587,9 +445,13 @@ public:
         //     ROS_INFO("label = %d", clusteredBox.boxes[i].label);
         // }
         detect_pub.publish(clusteredBox);
+
         for(uint i = 0; i < point_pixel_y; ++i)
             for(uint j = 0; j < point_pixel_x; ++j)
-                if(total_pixel[i][j].count != 0) total_pixel[i][j].count = 0;
+                if(total_pixel[i][j].count != 0){
+                    total_pixel[i][j].count = 0;
+                    total_pixel[i][j].maxZ = -1.785;
+                }
         
 
         clusteredBox.boxes.resize(0);
@@ -615,6 +477,7 @@ public:
                 xyi.count = 0;
                 xyi.x = -poseX + next_x;
                 xyi.y = poseY - next_y;
+                xyi.maxZ = -1.785;
                 next_x = next_x + 2*boxSize;
                 xyi_vec.push_back(xyi);
             }
