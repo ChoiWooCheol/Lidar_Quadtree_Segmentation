@@ -7,14 +7,18 @@
 6. clustering
 7. 2d -> 3d as bounding boxes, Using Z axis information
 
-# input topic
-/points_raw
+# Input topic
+'/points_raw'
 
-# output topic
-/detected_boxes
-/projected_cloud
-/quad_cluster
+# Output topic
+'/detected_boxes'
+'/projected_cloud'
+'/quad_cluster'
 
-# run 
+# Run 
 roslaunch lidar_detect quadtree_seg_launch.launch --screen 
 
+
+# result
+1. segmentation
+![Screenshot from 2020-01-15 20-22-09](https://user-images.githubusercontent.com/46434674/72430251-34b41400-37d5-11ea-83a4-d790f9ea17ff.png)
