@@ -13,8 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
         image_transport
         roscpp
         tf
-        autoware_msgs
-        autoware_build_flags
         jsk_recognition_utils
         eigen_conversions
         tf_conversions
@@ -227,15 +225,6 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-
-add_executable(obj_detect
-  src/obj_detect.cpp
-)
-add_dependencies(obj_detect ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(obj_detect
-  ${catkin_LIBRARIES}
-)
-
 add_executable(test_detect
   src/test_detect.cpp
 )
@@ -249,5 +238,21 @@ add_executable(quadtree_seg
 )
 add_dependencies(quadtree_seg ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(quadtree_seg
+  ${catkin_LIBRARIES}
+)
+
+add_executable(RANSACK_plane
+  src/RANSACK_plane.cpp
+)
+add_dependencies(RANSACK_plane ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(RANSACK_plane
+  ${catkin_LIBRARIES}
+)
+
+add_executable(clustering_final
+  src/clustering_final.cpp
+)
+add_dependencies(clustering_final ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(clustering_final
   ${catkin_LIBRARIES}
 )
