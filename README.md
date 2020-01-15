@@ -22,3 +22,5 @@ roslaunch lidar_detect quadtree_seg_launch.launch --screen
 # result
 1. segmentation
 ![Screenshot from 2020-01-15 20-22-09](https://user-images.githubusercontent.com/46434674/72430251-34b41400-37d5-11ea-83a4-d790f9ea17ff.png)
+
+2. 3D object detection
