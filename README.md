@@ -7,6 +7,10 @@
 6. clustering
 7. 2d -> 3d as bounding boxes, Using Z axis information
 
+# Hardware
+1. HYUNDAI i30
+2. Ouster OS1 64 channel LiDAR
+
 # Input topic
 '/points_raw'
 
@@ -27,3 +31,4 @@ roslaunch lidar_detect quadtree_seg_launch.launch --screen
 ![Screenshot from 2020-01-15 20-31-24](https://user-images.githubusercontent.com/46434674/72430573-14d12000-37d6-11ea-83db-b62f73f6f495.png)
 
 3. 3D view with PointCloud2(3d pointcloud data)
+![Screenshot from 2020-01-15 20-34-34](https://user-images.githubusercontent.com/46434674/72430763-85783c80-37d6-11ea-8f5a-fbdc71599d87.png)
