@@ -12,12 +12,12 @@
 2. Ouster OS1 64 channel LiDAR
 
 # Input topic
-'/points_raw'
+ * '/points_raw'
 
 # Output topic
-'/detected_boxes'
-'/projected_cloud'
-'/quad_cluster'
+ * '/detected_boxes'
+ * '/projected_cloud'
+ * '/quad_cluster'
 
 # Run 
 roslaunch lidar_detect quadtree_seg_launch.launch --screen 
