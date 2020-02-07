@@ -20,8 +20,9 @@
  * '/quad_cluster'
 
 # Run 
-roslaunch lidar_detect quadtree_seg_launch.launch --screen 
-
+```sh
+$ roslaunch lidar_detect quadtree_seg_launch.launch --screen 
+``` 
 
 # result
 1. segmentation
